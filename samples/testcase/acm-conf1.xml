@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<modsCollection xmlns="http://www.loc.gov/mods/v3">
+<mods ID="Levis:2004:TSA:1251175.1251177">
+    <titleInfo>
+        <title>Trickle</title>
+        <subTitle>a self-regulating algorithm for code propagation and maintenance in wireless sensor networks</subTitle>
+    </titleInfo>
+    <name type="personal">
+        <namePart type="given">Philip</namePart>
+        <namePart type="family">Levis</namePart>
+        <role>
+            <roleTerm authority="marcrelator" type="text">author</roleTerm>
+        </role>
+    </name>
+    <name type="personal">
+        <namePart type="given">Neil</namePart>
+        <namePart type="family">Patel</namePart>
+        <role>
+            <roleTerm authority="marcrelator" type="text">author</roleTerm>
+        </role>
+    </name>
+    <name type="personal">
+        <namePart type="given">David</namePart>
+        <namePart type="family">Culler</namePart>
+        <role>
+            <roleTerm authority="marcrelator" type="text">author</roleTerm>
+        </role>
+    </name>
+    <name type="personal">
+        <namePart type="given">Scott</namePart>
+        <namePart type="family">Shenker</namePart>
+        <role>
+            <roleTerm authority="marcrelator" type="text">author</roleTerm>
+        </role>
+    </name>
+    <originInfo>
+        <dateIssued>2004</dateIssued>
+    </originInfo>
+    <typeOfResource>text</typeOfResource>
+    <relatedItem type="host">
+        <titleInfo>
+            <title>Proceedings of the 1st conference on Symposium on Networked Systems Design and Implementation - Volume 1</title>
+        </titleInfo>
+        <originInfo>
+            <publisher>USENIX Association</publisher>
+            <place>
+                <placeTerm type="text">Berkeley, CA, USA</placeTerm>
+            </place>
+        </originInfo>
+        <genre authority="marcgt">conference publication</genre>
+        <location>
+            <physicalLocation>San Francisco, California</physicalLocation>
+        </location>
+    </relatedItem>
+    <identifier type="citekey">Levis:2004:TSA:1251175.1251177</identifier>
+    <location>
+        <url>http://dl.acm.org/citation.cfm?id=1251175.1251177</url>
+    </location>
+    <part>
+        <date>2004</date>
+        <extent unit="page">
+            <start>2</start>
+            <end>2</end>
+        </extent>
+    </part>
+</mods>
+</modsCollection>

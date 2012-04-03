@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modsCollection xmlns="http://www.loc.gov/mods/v3">
+<mods ID="DBLP:journals/cg/ZengMKG11">
+    <titleInfo>
+        <title>Volumetric colon wall unfolding using harmonic differentials</title>
+    </titleInfo>
+    <name type="personal">
+        <namePart type="given">Wei</namePart>
+        <namePart type="family">Zeng</namePart>
+        <role>
+            <roleTerm authority="marcrelator" type="text">author</roleTerm>
+        </role>
+    </name>
+    <name type="personal">
+        <namePart type="given">Joseph</namePart>
+        <namePart type="family">Marino</namePart>
+        <role>
+            <roleTerm authority="marcrelator" type="text">author</roleTerm>
+        </role>
+    </name>
+    <name type="personal">
+        <namePart type="given">Arie</namePart>
+        <namePart type="given">E</namePart>
+        <namePart type="family">Kaufman</namePart>
+        <role>
+            <roleTerm authority="marcrelator" type="text">author</roleTerm>
+        </role>
+    </name>
+    <name type="personal">
+        <namePart type="given">Xianfeng</namePart>
+        <namePart type="given">David</namePart>
+        <namePart type="family">Gu</namePart>
+        <role>
+            <roleTerm authority="marcrelator" type="text">author</roleTerm>
+        </role>
+    </name>
+    <originInfo>
+        <dateIssued>2011</dateIssued>
+    </originInfo>
+    <typeOfResource>text</typeOfResource>
+    <relatedItem type="host">
+        <titleInfo>
+            <title>Computers {\&amp;} Graphics</title>
+        </titleInfo>
+        <originInfo>
+            <issuance>continuing</issuance>
+        </originInfo>
+        <genre authority="marcgt">periodical</genre>
+        <genre>academic journal</genre>
+    </relatedItem>
+    <identifier type="citekey">DBLP:journals/cg/ZengMKG11</identifier>
+    <part>
+        <date>2011</date>
+        <detail type="volume"><number>35</number></detail>
+        <detail type="number"><number>3</number></detail>
+        <extent unit="page">
+            <start>726</start>
+            <end>732</end>
+        </extent>
+    </part>
+</mods>
+</modsCollection>

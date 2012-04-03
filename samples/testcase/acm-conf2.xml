@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<modsCollection xmlns="http://www.loc.gov/mods/v3">
+<mods ID="Maltz:1995:PWA:223904.223930">
+    <titleInfo>
+        <title>Pointing the way</title>
+        <subTitle>active collaborative filtering</subTitle>
+    </titleInfo>
+    <name type="personal">
+        <namePart type="given">David</namePart>
+        <namePart type="family">Maltz</namePart>
+        <role>
+            <roleTerm authority="marcrelator" type="text">author</roleTerm>
+        </role>
+    </name>
+    <name type="personal">
+        <namePart type="given">Kate</namePart>
+        <namePart type="family">Ehrlich</namePart>
+        <role>
+            <roleTerm authority="marcrelator" type="text">author</roleTerm>
+        </role>
+    </name>
+    <originInfo>
+        <dateIssued>1995</dateIssued>
+    </originInfo>
+    <typeOfResource>text</typeOfResource>
+    <relatedItem type="host">
+        <titleInfo>
+            <title>Proceedings of the SIGCHI conference on Human factors in computing systems</title>
+        </titleInfo>
+        <originInfo>
+            <publisher>ACM Press/Addison-Wesley Publishing Co.</publisher>
+            <place>
+                <placeTerm type="text">New York, NY, USA</placeTerm>
+            </place>
+        </originInfo>
+        <genre authority="marcgt">conference publication</genre>
+        <relatedItem type="host">
+            <titleInfo>
+                <title>CHI ’95</title>
+            </titleInfo>
+        </relatedItem>
+        <identifier type="isbn">0-201-84705-1</identifier>
+        <location>
+            <physicalLocation>Denver, Colorado, United States</physicalLocation>
+        </location>
+    </relatedItem>
+    <identifier type="citekey">Maltz:1995:PWA:223904.223930</identifier>
+    <identifier type="doi">http://dx.doi.org/10.1145/223904.223930</identifier>
+    <location>
+        <url>http://dx.doi.org/10.1145/223904.223930</url>
+    </location>
+    <part>
+        <date>1995</date>
+        <extent unit="page">
+            <start>202</start>
+            <end>209</end>
+        </extent>
+    </part>
+</mods>
+</modsCollection>

@@ -1,0 +1,607 @@
+#!/usr/bin/python2.4
+# -*- coding: iso-8859-1 -*-
+# This file is part of the Basilic system
+# Copyright (C) 2004  Gilles Debunne (Gilles.Debunne@imag.fr)
+# Version 1.5.14, packaged on May 2, 2007.
+# 
+# http://artis.imag.fr/Software/Basilic
+# 
+# Basilic  is  free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published
+# by the Free Software Foundation; either version 2 of the License,
+# or (at your option) any later version.
+# 
+# Basilic  is  distributed  in the hope that it will be useful, but
+# WITHOUT  ANY  WARRANTY ; without  even  the  implied  warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with Basilic; if not, write to the Free Software Foundation
+# Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+from pyxdkbibtex import *
+
+import string
+
+import sys
+
+if len(sys.argv) != 2:
+    print "Usage : "+sys.argv[0]+" bibfile"
+    sys.exit(0)
+
+
+validTypes = ("Article","Book","Booklet","InBook","InCollection","InProceedings","Manual","PhdThesis","Misc","MastersThesis","TechReport","Proceedings","Unpublished")
+VALIDTYPES = []
+requiredFields = {}
+optionalFields = {}
+for t in validTypes:
+    VALIDTYPES.append(t.upper())
+    requiredFields[t] = ["title","year"]
+    optionalFields[t] = ["month","key","keywords"]
+
+requiredFields["Article"].append("journal")
+optionalFields["Article"].append("volume");
+optionalFields["Article"].append("number");
+optionalFields["Article"].append("pages");
+optionalFields["Article"].append("note");
+
+requiredFields["Book"].append("publisher");
+optionalFields["Book"].append("volume"); # volume or number
+optionalFields["Book"].append("number");
+optionalFields["Book"].append("series");
+optionalFields["Book"].append("address");
+optionalFields["Book"].append("edition");
+optionalFields["Book"].append("note");
+
+optionalFields["Booklet"].append("howpublished");
+optionalFields["Booklet"].append("address");
+optionalFields["Booklet"].append("note");
+
+requiredFields["InBook"].append("publisher");
+optionalFields["InBook"].append("volume");
+optionalFields["InBook"].append("number");
+optionalFields["InBook"].append("chapter"); # chapter and/or pages
+optionalFields["InBook"].append("pages");   #
+optionalFields["InBook"].append("series");
+optionalFields["InBook"].append("type");
+optionalFields["InBook"].append("address");
+optionalFields["InBook"].append("edition");
+optionalFields["InBook"].append("note");
+
+requiredFields["InCollection"].append("booktitle");
+requiredFields["InCollection"].append("publisher");
+optionalFields["InCollection"].append("editor");
+optionalFields["InCollection"].append("volume");
+optionalFields["InCollection"].append("number");
+optionalFields["InCollection"].append("series");
+optionalFields["InCollection"].append("type");
+optionalFields["InCollection"].append("chapter");
+optionalFields["InCollection"].append("pages");
+optionalFields["InCollection"].append("address");
+optionalFields["InCollection"].append("edition");
+optionalFields["InCollection"].append("note");
+
+requiredFields["InProceedings"].append("booktitle");
+optionalFields["InProceedings"].append("editor");
+optionalFields["InProceedings"].append("volume");
+optionalFields["InProceedings"].append("number");
+optionalFields["InProceedings"].append("series");
+optionalFields["InProceedings"].append("pages");
+optionalFields["InProceedings"].append("address");
+optionalFields["InProceedings"].append("organization");
+optionalFields["InProceedings"].append("publisher");
+optionalFields["InProceedings"].append("note");
+
+optionalFields["Manual"].append("organization");
+optionalFields["Manual"].append("address");
+optionalFields["Manual"].append("edition");
+optionalFields["Manual"].append("note");
+
+requiredFields["PhdThesis"].append("school");
+optionalFields["PhdThesis"].append("type");
+optionalFields["PhdThesis"].append("address");
+optionalFields["PhdThesis"].append("note");
+requiredFields["MastersThesis"].append("school");
+optionalFields["MastersThesis"].append("type");
+optionalFields["MastersThesis"].append("address");
+optionalFields["MastersThesis"].append("note");
+
+optionalFields["Misc"].append("howpublished");
+optionalFields["Misc"].append("note");
+
+optionalFields["Proceedings"].append("editor");
+optionalFields["Proceedings"].append("volume");
+optionalFields["Proceedings"].append("number");
+optionalFields["Proceedings"].append("series");
+optionalFields["Proceedings"].append("address");
+optionalFields["Proceedings"].append("organization");
+optionalFields["Proceedings"].append("publisher");
+optionalFields["Proceedings"].append("note");
+
+requiredFields["TechReport"].append("institution");
+optionalFields["TechReport"].append("type");
+optionalFields["TechReport"].append("number");
+optionalFields["TechReport"].append("address");
+optionalFields["TechReport"].append("note");
+
+requiredFields["Unpublished"].append("note");
+
+fields = {}
+for t in validTypes:
+    fields[t] = []
+    for r in requiredFields[t]:
+        fields[t].append(r)
+    for o in optionalFields[t]:
+        fields[t].append(o)
+
+isoa = dict()
+isob = dict() # For expressions of iso enclosed into braces
+isoa["\\`A"] = "À"
+isoa["\\'A"] = "Á"
+isoa["\\~A"] = "Ã"
+isoa["\\^A"] = "Â"
+isoa["\\rA "] = "Å"
+isoa["\\AA "] = "Å"
+isoa["\\AE "] = "Æ"
+isoa["\\`E"] = "È"
+isoa["\\'E"] = "É"
+isoa["\\^E"] = "Ê"
+isoa["\\`I"] = "Ì"
+isoa["\\'I"] = "Í"
+isoa["\\^I"] = "Î"
+isoa["\\O"] = "Ø"
+isoa["\\`O"] = "Ò"
+isoa["\\'O"] = "Ó"
+isoa["\\^O"] = "Ô"
+isoa["\\~O"] = "Õ"
+isoa["\\`U"] = "Ù"
+isoa["\\'U"] = "Ú"
+isoa["\\^U"] = "Û"
+isoa["\\'Y"] = "Ý"
+isoa["\\c{C}"] = "Ç"
+isoa["\\~N"] = "Ñ"
+isoa["\\ss "] = "ß"
+isoa["\\`a"] = "à"
+isoa["\\'a"] = "á"
+isoa["\\~a"] = "ã"
+isoa["\\^a"] = "â"
+isoa["\\ra "] = "å"
+isoa["\\aa "] = "å"
+isoa["\\ae "] = "æ"
+isoa["\\`e"] = "è"
+isoa["\\'e"] = "é"
+isoa["\\^e"] = "ê"
+isoa["\\`i"] = "ì"
+isoa["\\'i"] = "í"
+isoa["\\^i"] = "î"
+isoa["\\`\\i"] = "ì"
+isoa["\\'\\i"] = "í"
+isoa["\\^\\i"] = "î"
+isoa["\\`{\\i}"] = "ì"
+isoa["\\'{\\i}"] = "í"
+isoa["\\^{\\i}"] = "î"
+isoa["\\o"] = "ø"
+isoa["\\`o"] = "ò"
+isoa["\\'o"] = "ó"
+isoa["\\^o"] = "ô"
+isoa["\\~o"] = "õ"
+isoa["\\`u"] = "ù"
+isoa["\\'u"] = "ú"
+isoa["\\^u"] = "û"
+isoa["\\'y"] = "ý"
+isoa["\\\"y"] = "ÿ"
+isoa["\\c{c}"] = "ç"
+isoa["\\~n"] = "ñ"
+isoa["\\~{n}"] = "ñ"
+isoa["\\th "] = "þ"
+isoa["\\dh "] = "ð"
+isoa["\\TH "] = "Þ"
+isoa["\\DH "] = "Ð"
+isoa["\\{th}"] = "þ"
+isoa["\\{dh}"] = "ð"
+isoa["\\{TH}"] = "Þ"
+isoa["\\{DH}"] = "Ð"
+
+isoa["\\\"A"] = "Ä"
+isoa["\\\"E"] = "Ë"
+isoa["\\\"I"] = "Ï"
+isoa["\\\"O"] = "Ö"
+isoa["\\\"U"] = "Ü"
+isoa["\\\"a"] = "ä"
+isoa["\\\"e"] = "ë"
+isoa["\\\"i"] = "ï"
+isoa["\\\"\\i"] = "ï"
+isoa["\\\"{\\i}"] = "ï"
+isoa["\\\"o"] = "ö"
+isoa["\\\"u"] = "ü"
+isoa["\\\"Y"] = "ÿ"
+isoa["\\\"y"] = "ÿ"
+
+isob["{\\\"O}"] = "Ö"
+isob["{\\\"I}"] = "Ï"
+isob["{\\\"A}"] = "Ä"
+isob["{\\\"E}"] = "Ë"
+isob["{\\\"U}"] = "Ü"
+isob["{\\\"a}"] = "ä"
+isob["{\\\"e}"] = "ë"
+isob["{\\\"i}"] = "ï"
+isob["{\\\"{\\i}}"] = "ï"
+isob["{\\\"\\i}"] = "ï"
+isob["{\\\"o}"] = "ö"
+isob["{\\\"u}"] = "ü"
+isob["{\\\"Y}"] = "ÿ"
+isob["{\\\"y}"] = "ÿ"
+
+def iso(w):
+    for l in isob:
+        w = w.replace(l, isob[l])
+    for l in isoa:
+        w = w.replace(l, isoa[l])
+    return w
+
+def stdtype(t):
+    if t in validTypes:
+        return t
+    else:
+        if t.upper() in VALIDTYPES:
+            index = VALIDTYPES.index(t.upper())
+            return validTypes[index]
+        else:
+            return "Unknown type"
+
+def clean(i):
+    i=str(i)
+    i=i.strip()
+    i=i.replace("\n","")
+    # i=i.replace("{","")
+    # i=i.replace("}","")
+    while i.find("  ") != -1:
+        i=i.replace("  "," ")
+    i=iso(i)
+    return i.replace("'","\\'")
+    
+def publi(entry):
+    return "\""+clean(entry.field("title"))+"\", line %d" % entry.line()
+
+def check(entry):
+    global missingField
+    ty = stdtype(entry.type())
+    for req in requiredFields[ty]:
+        if entry.field(req).isMissing():
+            print "Required field",req,"is not present in "+publi(entry)
+            missingField=missingField+1
+            if req=="year":
+                if ty=="Booklet" or ty=="Manual" or ty=="Misc" or ty=="Unpublished":
+                    print "The \"year\" field is optional in the standard for type",ty+"."
+                    print "It is however here required in order to automatically compute the bibTex key."
+            if req=="title" and ty=="Misc":
+                print "The \"title\" field is optional in the standard for type",ty
+                print "It is however here required as it has to appear in the publication listing"
+        else:
+            if len(str(entry.field(req)).strip()) == 0:
+                print "Field",req,"is empty in "+publi(entry)
+                missingField=missingField+1
+    if ty=="Book" or ty=="InBook" or ty=="InCollection" or ty=="InProceedings" or ty=="Proceedings":
+        if not entry.field("number").isMissing() and not entry.field("volume").isMissing():
+            print "Only volume or number is accepted, not both : "+publi(entry)
+            missingField=missingField+1
+    if ty=="InBook":
+        if entry.field("chapter").isMissing() and entry.field("pages").isMissing():
+            print "Fields \"chapter\" and/or \"pages\" must be given for : "+publi(entry)
+            missingField=missingField+1
+    if ty=="Proceedings":
+        if not entry.field("editor").isMissing():
+            print "Problem with the \"editor\" field in",publi(entry)
+            if entry.field("author").isMissing():
+                print "  You should rename the field \"editor\" into \"author\""
+            else:
+                print "  You should merge the \"editor\" and \"author\" into an \"author\" field (or rename \"editor\" as \"note\")"
+            # print "  This will be automatic in future releases"
+    if ty=="Book" or ty=="InBook":
+        if not entry.field("editor").isMissing():
+            print "\"author\" should replace \"editor\" in",ty,"entries : ",publi(entry)
+            if entry.field("author").isMissing():
+                print "  You should replace \"editor\" by \"author\""
+            else:
+                print "  You should merge \"editor\" and \"author\", or rename \"editor\" as \"note\""
+            # print "  This will be automatic in future releases"
+
+allBibtex = []
+
+def bibTexKey(entry):
+    bibtex=""
+    author = e.field("author")
+    auth = AuthorList()
+
+    try:
+        auth.readFrom(author.value())
+    except Exception, ex:
+        print "Syntax error in authors for "+publi(entry)
+        print ex
+        sys.exit(1)
+
+    if len(auth) == 1:
+        bibtex = ((string.join(auth[0].last()))[0:3]).title()
+    else:
+        for a in auth:
+            bibtex = bibtex + (string.join(a.last()).upper())[0]
+    bibtex = bibtex+str(e.field("year"))[2:4]
+    if bibtex in allBibtex:
+        root = bibtex
+        index = ord('a')
+        while bibtex in allBibtex:
+            bibtex = root+chr(index)
+            index = index+1
+    allBibtex.append(bibtex)
+    return bibtex
+
+# Read the entries
+try:
+    inputFile = File()
+    inputFile.readFromFile(sys.argv[1])
+    entries = inputFile.entries()
+except Exception, e:
+    print e
+    sys.exit(1)
+
+
+badType=False
+for e in entries:
+    if stdtype(e.type()) not in validTypes:
+        badType=True
+        print ">> Unrecognized type ("+e.type()+") for "+publi(e)
+
+if badType:
+    print "\nValid publication types are:"
+    for t in validTypes:
+        print " "+t,
+    print "\nChange publication type or remove entry (or add this new type in the database)."
+    sys.exit(0)
+
+# Look for missing required fields
+missingField = 0
+for e in entries:
+    check(e)
+
+if missingField:
+    print "\n"+str(missingField)+" missing required fields."
+    sys.exit(0)
+
+# Look for extra fields that will be lost
+extraField=0
+for e in entries:
+    ty = stdtype(e.type())
+    h = e.firstField()
+    while h:
+        if h.name() != "author" and h.name() not in fields[ty]:
+            print ">> Field \""+h.name()+"\" (\""+clean(h)+"\"), defined line %d will be lost." % h.line()
+            if (h.name()=="page"): print "  >> \"page\" should be spelled \"pages\""
+            whereAvailable=[]
+            for t in validTypes:
+                if h.name() in fields[t]:
+                    whereAvailable.append(t)
+            if len(whereAvailable):
+                print "   \""+h.name()+"\" is only valid for entries of type:",
+                for w in whereAvailable:
+                    print w+",",
+                print
+            extraField=extraField+1
+        h.next()
+
+if extraField:
+    print "\n"+str(extraField)+" non standard fields will be lost during conversion (see messages above)."
+    print "If you want to preserve these informations, edit "+sys.argv[1]+" and change the fields' names,"
+    print "check their spelling or convert these fields into a \"note\". Then re-run "+sys.argv[0]+".\n"
+
+# Titles, journals and booktitles listing
+titles = []
+journals = []
+booktitles = []
+for e in entries:
+    titles.append(clean(e.field("title")))
+    if len(str(e.field("booktitle"))): booktitles.append(clean(e.field("booktitle")))
+    if len(str(e.field("journal"))): journals.append(clean(e.field("journal")))
+
+def authorKey(first, last):
+    return last.upper()+" "+(fi.upper())[0]
+
+# Create author list and search for duplicates
+first = []
+last = []
+AUTHORid = {}
+for e in entries:
+    author = e.field("author")
+    if author.isMissing():
+        print "No authors given for publication "+publi(e)
+        ty=stdtype(e.type())
+        if ty=="Booklet" or ty=="Manual" or ty=="Misc":
+            print "  The \"author\" field is optional in the standard for type",ty,"."
+            print "  It is however here required in order to automatically compute the bibTex key."
+        sys.exit(0)
+    else:
+        auth = AuthorList()
+        try:
+            auth.readFrom(author.value())
+        except Exception, ex:
+            print "Syntax error while reading authors for "+publi(e)
+            print ex
+            sys.exit(1)
+        for a in auth:
+            index=len(first)
+            t = Text()
+            t.readFrom(string.join(a.first()))
+            fi = clean(t.content())
+            first.append(fi)
+            t.readFrom(string.join(a.von())+string.join(a.last())+string.join(a.jr()))
+            last.append(clean(t.content()))
+            t.readFrom(string.join(a.last()))
+            la=clean(t.content())
+            NAME=authorKey(fi, la)
+            if AUTHORid.has_key(NAME):
+                AUTHORid[NAME].append(index)
+            else:
+                AUTHORid[NAME] = [index]
+
+
+titles.sort()
+journals.sort()
+booktitles.sort()
+
+f = file("titleList.txt", 'w')
+f.write("## List of titles : check spelling and remove spurious braces\n\n")
+for t in titles:
+    f.write(t+"\n")
+f.close()
+
+# Journal listing
+f = file("journalList.txt", 'w')
+f.write("## List of journals\n\n")
+f.write("## Clear duplicates, correct and uniformize spellings to shorten the list as much as possible.\n")
+f.write("## Remove year, number and volume from names. Expand acronyms if needed.\n")
+f.write("## Final list should only contains different journals.\n\n")
+prev = ""
+for j in journals:
+    if j != prev:
+        f.write(j+"\n")
+        prev = j
+f.close()
+
+f = file("booktitleList.txt", 'w')
+f.write("## List of booktitles\n\n")
+f.write("## Clear duplicates, correct and uniformize spellings to shorten the list as much as possible.\n")
+f.write("## \"Proceedings of ConfFoo\", \"Proc. of ConfFoo\"  and \"ConfFoo'04\" should for instance\n")
+f.write("## be merged, probably in \"Proceedings of ConfFoo\". Remove years from booktitles' names.\n")
+f.write("## Final list should only contain different InProceedings booktitles.\n\n")
+prev = ""
+for b in booktitles:
+    if b != prev:
+        f.write(b+"\n")
+        prev = b
+f.close()
+
+# Search for duplicated titles
+TITLES = []
+for t in titles:
+    TITLES.append(t.upper())
+
+nb=0
+for t in titles:
+    nb=nb+1
+    SUBTITLES=TITLES[nb:]
+    if SUBTITLES.count(t.upper()) != 0:
+        print ">> Title \""+t+"\" is duplicated. Should be checked."
+
+print
+
+f = file("authorList.txt", 'w')
+f.write("## List of authors\n\n")
+f.write("## Look for duplicates.\n")
+f.write("## Complete first names when possible, check spelling.\n")
+f.write("## Convert into latin characters or remove LaTeX specific commands.\n")
+f.write("## Names listed on the same line will actually be merged and replaced by the first one.\n\n")
+
+NAMES = AUTHORid.keys()
+NAMES.sort()
+
+for NAME in NAMES:
+    names = []
+    for i in AUTHORid[NAME]:
+        names.append(last[i]+", "+first[i])
+    old=""
+    for new in names:
+        if new != old:
+            if old!="":
+                f.write("\t\t(aka) ")
+            f.write(new)
+            if new.find("{") != -1 or new.find("}") != -1:
+                f.write("\t(Check brace)")
+            else:
+                if new.find("\\") != -1:
+                    f.write("\t(Check the \\)")
+            old=new
+    f.write("\n")
+f.close()
+
+# Write out a "BibTeX key" to "Basilic key" translation file.
+# This is just to help users populate their publication directories.
+# Advanced users may want to comment out these lines
+
+f = file("keys.txt", 'w')
+f.write("## Debug : lists new Basilic bibTex keys that differ from previous ones.\n\n")
+f.write("## Only interesting if you update an existing basilic installation\n")
+f.write("## Reorder entries in the bibtex if KEY04 and KEY04b are swaped.\n")
+f.write("## You should empty this file. Otherwise, you'll have to rename dirs.\n")
+f.write("\n# Generated key / Key in file.\n")
+nbDifferentKey = 0
+for e in entries:
+    genKey=bibTexKey(e)
+    if genKey != e.key():
+        f.write(genKey+"\t"+e.key()+"\n");
+        nbDifferentKey = nbDifferentKey+1
+f.close();
+if nbDifferentKey != 0:
+    print nbDifferentKey,"keys are different.\n"
+allBibtex = []
+
+
+print "Parsing complete. You should now open the following files:"
+print "  authorList.txt, booktitleList.txt, journalList.txt and titleList.txt."
+print "Modify "+sys.argv[1]+" according to the advice given in them."
+print "Re-run "+sys.argv[0]+" and re-check the files until your bibTex is clean."
+
+
+# Databases creation
+#  Authors
+f = file("authors.sql", 'w')
+authorId = {}
+idAuthor=1
+for NAME in NAMES:
+    f.write("INSERT INTO authors VALUES ("+str(idAuthor)+", '"+iso(first[AUTHORid[NAME][0]]).replace("'","\\'")+"', '"+iso(last[AUTHORid[NAME][0]]).replace("'","\\'")+"', NULL);\n")
+    authorId[NAME] = idAuthor
+    idAuthor = idAuthor+1
+f.close
+  
+publiFields = ["address","booktitle","chapter","edition","editor","howpublished","institution","journal","keywords","month","note","number","key","organization","pages","publisher","school","series","title","type","volume","year"]
+
+fp = file("publis.sql", 'w')
+fpa = file("publiauthors.sql", 'w')
+idPubli=1
+
+for e in entries:
+    ty = stdtype(e.type())
+    fp.write("INSERT INTO publis VALUES ("+str(idPubli)+", '"+bibTexKey(e)+"', '"+ty+"'")
+    for f in publiFields:
+        if f in fields[ty]:
+            fi=e.field(f)
+            if fi.isMissing():
+                fp.write(", ''")
+            else:
+                fp.write(", '"+clean(fi)+"'")
+        else:
+            fp.write(", ''")
+    fp.write(");\n")
+
+    author = e.field("author")
+    if author.isMissing():
+        print "No author given for publication", publi(e)
+    else:
+        auth = AuthorList()
+        auth.readFrom(author.value())
+        rank=1
+        for a in auth:
+            t = Text()
+            t.readFrom(string.join(a.first()))
+            fi = clean(t.content())
+            t.readFrom(string.join(a.last()))
+            la = clean(t.content())
+            aId = authorId[authorKey(fi, la)]
+            fpa.write("INSERT INTO publiauthors VALUES ("+str(aId)+", "+str(idPubli)+", "+str(rank)+");\n")
+            rank=rank+1
+    idPubli = idPubli+1
+fp.close()
+fpa.close()
+
+print "\nOnce this is done, import the mySQL queries listed in"
+print " authors.sql, publiauthors.sql and publis.sql"
+print "to fill the databases. Enjoy !"
