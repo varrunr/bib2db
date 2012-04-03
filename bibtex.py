@@ -49,6 +49,7 @@ class Bibtex:
         self.issn = ""
         self.doi = ""
         self.abstract = "" 
+        self.url = ""
                    
     def append_name(author_name):
         list_of_names.append(author_name)
@@ -69,6 +70,7 @@ class Bibtex:
         print "Type of pub: " + self.type_of_publication
         print "Publisher: " + self.publisher
         print "ISSN: " + self.issn 
+        print "URL: " + self.url
         #Other
         print "Keywords:"
         print self.keywords

@@ -2,7 +2,7 @@ from bibtex import *
 import xml.etree.ElementTree as ET
 
 namespace = "{http://www.loc.gov/mods/v3}"
-xml_dir = '/home/varrun/Desktop/vislab/samples/testcase/'
+xml_dir = './samples/testcase/'
 
 def get_tag(tag_name):
     list_of_tags = tag_name.split('/')
@@ -140,14 +140,13 @@ def populate_cite_info(rootElement,bib):
             if info.items()[0] == ('type','citekey'):
                 #  TODO
                 1 + 1
-            else: 
-                if info.items()[0] == ('type','doi'):
-                    bib.doi = info.text
+            if info.items()[0] == ('type','doi'):
+                bib.doi = info.text
     
     #get publication url
     url = rootElement.find(get_tag('mods/location/url'))
-    #if not_none(url):
-        #bib.url = url.text
+    if not_none(url):
+        bib.url = url.text
     return bib
 
 #    list_of_detail = rootElement.findall(get_tag('mods/part/detail'))
@@ -163,11 +162,14 @@ def populate_cite_info(rootElement,bib):
 #        related_map['page']= page_map
 ##   return bib
 
-def populate_origin_info(rootElement):
+def populate_origin_info(rootElement,bib):
     origin_info =  rootElement.find( get_tag('mods/originInfo' ))
     origin_map = {}
-    origin_map['DateIssued'] = origin_info.findtext(get_tag('dateIssued'))
-    return origin_map
+    date = origin_info.findtext(get_tag('dateIssued'))
+    date = date.split('-')
+    bib.year = date[0]
+    bib.month = date[1]
+    return bib
 
 def populate_related_items(rootElement):
     related_info =  rootElement.find( get_tag('mods/relatedItem' ))
@@ -198,17 +200,18 @@ def process_xml(filename):
     bib_no = 1
     bib = Bibtex(bib_no, filename);
     rootElement = bib.parsedoc()
-    bib = populate_names(rootElement,bib)
+    bib = populate_names(rootElement, bib)
     # TODO: Homepage?
-    bib = populate_title(rootElement,bib)
-    bib = populate_cite_info(rootElement,bib)
-    bib = populate_issue_info(rootElement,bib)
+    bib = populate_title(rootElement, bib)
+    bib = populate_cite_info(rootElement, bib)
+    bib = populate_issue_info(rootElement, bib)
+    bib = populate_origin_info(rootElement, bib)
     # TODO: Populate date, 
     #bib.add2db()
     print bib.pretty_print()
     return
     # TODO: Check if booktitle / journal
-    bibmap['OriginInfo'] = populate_origin_info(rootElement)
+
     bibmap['SourceInfo'] = populate_related_items(rootElement)
     
     return bibmap
@@ -218,3 +221,4 @@ def process_bib(filename):
 
 filename = str(raw_input())
 process_bib(filename)
+
