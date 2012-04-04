@@ -1,7 +1,7 @@
 from unzip import Unzip
 from bibtex import Bibtex
 import re
-
+from subprocess import call
 class Pipe:
     def __init__(self):
         self.output = []
@@ -29,9 +29,15 @@ def prune(file_list):
             pruned_list.append(f)
     return pruned_list
 
+def file2xml(filename):
+    xml = ['bib2xml',filename]
+    if xml.find('bib2xml: Processed 1 references.') is not None:
+        return xml
+    return -1
+
 def main():
-    zipsource = 'test.zip'
-    zipdest = './op'
+    zipsource = './unzip/test.zip'
+    zipdest = './unzip/op'
 
     " Unzip uploaded zip file "
     file_list = unzip_file(zipsource,zipdest)
