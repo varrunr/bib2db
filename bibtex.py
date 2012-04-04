@@ -94,4 +94,3 @@ class Bibtex:
         print "Vol: " + self.volume
         print "doi: " + self.doi
         print "abstract: " + self.abstract
-
