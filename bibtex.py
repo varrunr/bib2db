@@ -32,7 +32,7 @@ class Bibtex:
         self.chapter = ""
         self.edition = ""
         self.editor = ""
-        self.institution = ""
+        self.institution = ""     
         self.school = ""
         self.issn = ""
         # optional
@@ -50,7 +50,13 @@ class Bibtex:
         self.doi = ""
         self.abstract = "" 
         self.url = ""
-                   
+
+    def process(self):
+        #TODO: process bibtex
+        status = "Successful"
+        errors = "None"
+        return (status , errors)
+
     def append_name(author_name):
         list_of_names.append(author_name)
     

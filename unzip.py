@@ -21,7 +21,7 @@ import os
 import os.path
 import getopt
 
-class unzip:
+class Unzip:
     def __init__(self, verbose = False, percent = 10):
         self.verbose = verbose
         self.percent = percent
@@ -84,11 +84,11 @@ class unzip:
         return dirs
    
 def main():
-    unzipper = unzip()
+    unzipper = Unzip()
     zipsource = 'test.zip'
     zipdest = './op'
     print unzipper.extract(zipsource, zipdest)
 
-if __name__ == '__main__': main()
+#if __name__ == '__main__': main()
 ## end of http://code.activestate.com/recipes/252508/ }}}
 
