@@ -1,4 +1,6 @@
 import xml.etree.ElementTree as ET
+#from parse import *
+
 
 class Author:
     def __init__(self,first = '',last = '',
@@ -50,21 +52,16 @@ class Bibtex:
         self.doi = ""
         self.abstract = "" 
         self.url = ""
-
-    def process(self):
-        #TODO: process bibtex
-        status = "Successful"
-        errors = "None"
-        return (status , errors)
-
+        self.address = ""
+    
     def append_name(author_name):
         list_of_names.append(author_name)
     
     def add2db(self):
         pass
 
-    def parsedoc(self):
-        return  (ET.parse(self.filename)).getroot()
+#    def parsedoc(self):
+#        return  (ET.parse(self.filename)).getroot()
 
     def pretty_print(self):
         #Important fields

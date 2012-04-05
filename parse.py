@@ -1,4 +1,5 @@
 from bibtex import *
+#from author import Author
 import xml.etree.ElementTree as ET
 
 namespace = "{http://www.loc.gov/mods/v3}"
@@ -168,7 +169,7 @@ def populate_origin_info(rootElement,bib):
     date = origin_info.findtext(get_tag('dateIssued'))
     date = date.split('-')
     bib.year = date[0]
-    bib.month = date[1]
+    #bib.month = date[1]
     return bib
 
 def populate_related_items(rootElement):
@@ -195,11 +196,9 @@ def populate_related_items(rootElement):
     
     return related_map
 
-def process_xml(filename):
-    bibmap = {}
-    bib_no = 1
-    bib = Bibtex(bib_no, filename);
-    rootElement = bib.parsedoc()
+def process_xml(bib,xml):
+    errors = 0
+    rootElement = ET.XML(xml)
     bib = populate_names(rootElement, bib)
     # TODO: Homepage?
     bib = populate_title(rootElement, bib)
@@ -208,16 +207,15 @@ def process_xml(filename):
     bib = populate_origin_info(rootElement, bib)
     # TODO: Populate date, 
     #bib.add2db()
-    print bib.pretty_print()
-    return
+    #print bib.pretty_print()
+    return bib , 1, errors
     # TODO: Check if booktitle / journal
-
     bibmap['SourceInfo'] = populate_related_items(rootElement)
     
     return bibmap
    
-def process_bib(filename):
-    results =  process_xml(xml_dir + filename)
+#def process_bib(filename):
+#    results =  process_xml(xml_dir + filename)
 
-filename = str(raw_input())
-process_bib(filename)
+#filename = str(raw_input())
+#process_bib(filename)

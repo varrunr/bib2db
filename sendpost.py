@@ -2,22 +2,39 @@ import urllib2
 import urllib
 import bibtex
 
-url1 = 'http://pubdev.cs.sunysb.edu/Intranet/Authors/authorAction.php?action=check&last=Wang&first=Lei'
-url2 = 'http://pubdev.cs.sunysb.edu/Intranet/Publications/publiAction.php'
+#url1 = 'http://pubdev.cs.sunysb.edu/Intranet/Authors/authorAction.php?action=check&last=Wang&first=Lei'
+#url2 = 'http://pubdev.cs.sunysb.edu/Intranet/Publications/publiAction.php'
 
 authorAPI =  'http://pubdev.cs.sunysb.edu/Intranet/Authors/authorAction.php?'
 publicationAPI =  'http://pubdev.cs.sunysb.edu/Intranet/Publications/publiAction.php'
  
 def add_auth(first,last):
-    req_url = authorAPI + '?action=check&last=%s&first=%s' % (last,first)
-    response = urllib2.urlopen(req_url)
+    req_url = authorAPI + 'action=check&last=%s&first=%s' % (last,first)
+    req  = urllib2.Request(req_url)
+    response = urllib2.urlopen(req)
     auth_id = int(response.read())
     return auth_id
     #print auth_exists.get_data()
 
+def list2str(l):
+    strop = ''
+    for i in range(0,len(l)):
+        strop += str(l[i])
+        if i != (len(l) - 1):
+            strop += ','
+    return strop
+
 def add_pub(bib):
+    authorids = []
+    
+    for auth in bib.list_of_authors:
+        auth.id = add_auth(auth.first,auth.last)
+        authorids.append(auth.id)
+    
+    authorList = list2str(authorids)
+   
     values = {  'act':'add',
-                'authorList':'35,32', #TODO
+                'authorList': authorList,
                 'projectList':'',
                 'id':'',
                 'entry':'article',
@@ -39,13 +56,14 @@ def add_pub(bib):
                 'doi': bib.doi,
                 'note':'' #TODO
         }
+    
     data = urllib.urlencode(values)
     req = urllib2.Request(publicationAPI, data)
-    response = urllib2.urlopen(req)
+    response = urllib2.urlopen(req,data)
     pub_id = response.read()
     return pub_id
 
-"
+"""
 values = {  'act':'add',
             'authorList':'35,32',
             'projectList':'',
@@ -77,4 +95,4 @@ print response.read()
 #response = urllib2.urlopen(url)
 #print response.read()
 #print auth_exists.get_data()
-"
+"""
